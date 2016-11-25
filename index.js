@@ -12,18 +12,22 @@ Jodot.prototype.start = function(dutyFile) {
       if(err) {
         reject(err);
       } else {
-        var duties = Hjson.rt.parse(content);
+        // Parse as JSON object.
+        var duties = Hjson.rt.parse(content)
         var committed = duties.map(function(dutyDef) {
           return new Promise(function(resolve, reject) {
+            // Every duty will be set in a single Promise.
   	        load(dutyDef, resolve, reject);
           })
           .then(function(result) {
+            // Pass the duty as a parameter to 'process' function.
             process(result);
           })
           .catch(function(error) {
             console.log('Error starting duty: '+error);
           })
         });
+        // Resolve all promises.
         Promise.all(committed).then(function() {resolve()});
       }
     });
